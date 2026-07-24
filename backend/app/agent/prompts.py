@@ -1,3 +1,11 @@
+"""
+All the instructions we send to the LLM live here in one file.
+Keeping prompts separate from code makes them easy to tweak and read.
+"""
+
+# ---- Extraction ----
+# We ask the model to pull structured fields out of a messy complaint
+# document and return them as strict JSON so we can parse it reliably.
 EXTRACT_PROMPT = """You are a pharmaceutical Quality Assurance assistant.
 You read a customer complaint (for an API or finished drug product) and
 pull out the key details to fill a complaint intake form.
@@ -26,7 +34,7 @@ Complaint document:
 JSON:"""
 
 
-
+# ---- Risk / severity classification (bonus feature) ----
 RISK_PROMPT = """You are a pharmaceutical QA risk assessor.
 Given the complaint below, decide:
 
@@ -48,7 +56,7 @@ Complaint:
 JSON:"""
 
 
-
+# ---- Summary (bonus feature) ----
 SUMMARY_PROMPT = """Summarise this pharmaceutical complaint in ONE short
 sentence a QA reviewer can read at a glance. No preamble, just the sentence.
 
@@ -59,7 +67,8 @@ Complaint:
 Summary:"""
 
 
-
+# ---- Conversational Q&A about a complaint ----
+# Powers the "Ask me anything about this complaint" chat box in the UI.
 CHAT_PROMPT = """You are a pharmaceutical QA assistant. Answer the user's
 question about the complaint below. Be concise, factual and helpful. If the
 answer is not present in the complaint, say you don't have that information.
@@ -70,3 +79,19 @@ Complaint details:
 ---
 Question: {question}
 Answer:"""
+
+
+# ---- CAPA recommendation (bonus feature / 5th tool) ----
+# CAPA = Corrective And Preventive Action, a core QMS concept.
+CAPA_PROMPT = """You are a pharmaceutical QA specialist. Based on the complaint
+below, suggest a short CAPA (Corrective And Preventive Action):
+- one corrective action (fix the immediate problem)
+- one preventive action (stop it happening again)
+
+Keep it to two short sentences. Be practical.
+
+Complaint:
+---
+{text}
+---
+CAPA:"""

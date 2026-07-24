@@ -1,3 +1,13 @@
+/**
+ * Redux slice for the complaint form.
+ *
+ * It holds three things:
+ *   - fields: the current values in the form
+ *   - ai:     the extra AI insights (summary, risk, missing fields)
+ *   - status: whether we're currently extracting / saving
+ *
+ * The two "async thunks" below talk to the backend and update this state.
+ */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/client";
 
@@ -68,6 +78,7 @@ function applyExtraction(state, data) {
   });
   state.ai.summary = data.ai_summary || "";
   state.ai.risk = data.ai_risk || "";
+  state.ai.capa = data.ai_capa || "";
   state.ai.missingFields = data.missing_fields || [];
   state.ai.completenessNote = data.completeness_note || "";
   state.status = "idle";
@@ -77,7 +88,7 @@ const complaintSlice = createSlice({
   name: "complaint",
   initialState: {
     fields: { ...emptyFields },
-    ai: { summary: "", risk: "", missingFields: [], completenessNote: "" },
+    ai: { summary: "", risk: "", capa: "", missingFields: [], completenessNote: "" },
     chat: [],       // [{ role: "user" | "ai", text }]
     chatLoading: false,
     status: "idle", // idle | extracting | saving
@@ -92,7 +103,7 @@ const complaintSlice = createSlice({
     },
     resetForm(state) {
       state.fields = { ...emptyFields };
-      state.ai = { summary: "", risk: "", missingFields: [], completenessNote: "" };
+      state.ai = { summary: "", risk: "", capa: "", missingFields: [], completenessNote: "" };
       state.chat = [];
       state.saved = false;
       state.error = null;

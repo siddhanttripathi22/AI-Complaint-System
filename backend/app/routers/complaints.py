@@ -1,4 +1,11 @@
+"""
+The API endpoints for complaints.
 
+    POST /api/complaints/extract       -> paste text, get AI-filled fields
+    POST /api/complaints/extract-file  -> upload a file, get AI-filled fields
+    POST /api/complaints               -> save a complaint to the DB
+    GET  /api/complaints               -> list saved complaints
+"""
 import io
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -45,6 +52,7 @@ def _to_response(result: dict) -> schemas.ExtractResponse:
         fields=schemas.ComplaintFields(**result.get("fields", {})),
         ai_summary=result.get("summary"),
         ai_risk=result.get("risk"),
+        ai_capa=result.get("capa"),
         missing_fields=result.get("missing_fields", []),
         completeness_note=result.get("completeness_note"),
     )

@@ -1,4 +1,9 @@
+"""
+Pydantic schemas = the shape of data going in and out of the API.
 
+These are separate from the DB model on purpose: the API can accept
+partial data, and we can validate it before touching the database.
+"""
 from datetime import datetime
 from typing import Optional
 
@@ -13,7 +18,7 @@ class ExtractRequest(BaseModel):
 class AskRequest(BaseModel):
     """Body for /ask — a follow-up question about the current complaint."""
     question: str
-    context: str  
+    context: str  # the extracted complaint details, used to ground the answer
 
 
 class AskResponse(BaseModel):
@@ -45,6 +50,7 @@ class ExtractResponse(BaseModel):
     fields: ComplaintFields
     ai_summary: Optional[str] = None
     ai_risk: Optional[str] = None
+    ai_capa: Optional[str] = None
     missing_fields: list[str] = []
     completeness_note: Optional[str] = None
 

@@ -1,3 +1,14 @@
+/**
+ * The "AI Complaint Intake Assistant" (right panel).
+ *
+ * Two ways to give it a complaint:
+ *   1. Upload a file (PDF / DOCX / TXT / EML)
+ *   2. Paste the complaint text
+ *
+ * Either way it dispatches a thunk, the backend runs the LangGraph agent,
+ * and the extracted fields flow into the form on the left. The AI insights
+ * (summary, risk, completeness) are shown here.
+ */
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { extractFromText, extractFromFile, askQuestion } from "../store/complaintSlice";
@@ -29,9 +40,9 @@ export default function AIAssistant() {
         </span>
       </div>
 
-   
+      {/* File upload */}
       <div className="dropzone" onClick={() => fileInput.current.click()}>
-        Drag &amp; 
+        Drag &amp; drop complaint document here
         <br />
         or <strong>click to browse</strong>
         <input
@@ -50,7 +61,7 @@ export default function AIAssistant() {
 
       <div className="divider">— OR —</div>
 
-
+      {/* Paste text */}
       <textarea
         className="paste-area"
         placeholder="Paste complaint text / email here..."
@@ -66,7 +77,7 @@ export default function AIAssistant() {
         {busy ? "Analyzing..." : "Extract Details"}
       </button>
 
-   
+      {/* Loading bar while the agent works */}
       {busy && (
         <>
           <div className="progress"><span /></div>
@@ -82,7 +93,7 @@ export default function AIAssistant() {
         </div>
       )}
 
-   
+      {/* Default helper text before any extraction */}
       {!busy && !ai.summary && !error && (
         <div className="assistant-box">
           Upload a complaint document or paste text above. I'll read it and
@@ -90,7 +101,7 @@ export default function AIAssistant() {
         </div>
       )}
 
-  
+      {/* AI insights after extraction */}
       {ai.summary && (
         <div className="insight summary">
           <span className="insight-title">Complaint Summary</span>
@@ -109,8 +120,14 @@ export default function AIAssistant() {
           {ai.completenessNote}
         </div>
       )}
+      {ai.capa && (
+        <div className="insight summary">
+          <span className="insight-title">CAPA Recommendation</span>
+          {ai.capa}
+        </div>
+      )}
 
-    
+      {/* Conversational "Ask me anything about this complaint" chat */}
       {hasComplaint && (
         <div className="chat">
           <div className="chat-label">Ask about this complaint</div>
@@ -137,7 +154,7 @@ export default function AIAssistant() {
       )}
 
       <p className="disclaimer">
-    
+        AI responses may contain errors. Please verify information.
       </p>
     </div>
   );

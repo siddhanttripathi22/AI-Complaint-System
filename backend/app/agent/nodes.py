@@ -1,6 +1,16 @@
+"""
+The graph nodes.
 
+Each function is ONE step. It takes the current state, does its job,
+and returns only the pieces of state it changed. LangGraph merges those
+changes back into the shared state automatically.
+
+Flow:
+    check_input -> extract -> classify_risk -> check_completeness
+                -> summarize -> recommend_capa
+"""
 from app.agent.llm import ask_llm, parse_json
-from app.agent.prompts import EXTRACT_PROMPT, RISK_PROMPT, SUMMARY_PROMPT
+from app.agent.prompts import EXTRACT_PROMPT, RISK_PROMPT, SUMMARY_PROMPT, CAPA_PROMPT
 from app.agent.state import ComplaintState
 
 # The fields we treat as essential for a usable complaint record.
@@ -34,7 +44,8 @@ def classify_risk(state: ComplaintState) -> dict:
     severity = result.get("severity", "Minor")
     priority = result.get("priority", "Low")
 
-   
+    # Feed severity/priority back into the extracted fields so the form
+    # gets pre-filled with them too.
     fields = dict(state.get("fields", {}))
     fields["initial_severity"] = severity
     fields["priority"] = priority
@@ -70,3 +81,13 @@ def summarize(state: ComplaintState) -> dict:
     prompt = SUMMARY_PROMPT.format(text=state["raw_text"])
     summary = ask_llm(prompt).strip()
     return {"summary": summary}
+
+
+def recommend_capa(state: ComplaintState) -> dict:
+    """
+    CAPA recommendation (bonus feature).
+    Suggests a corrective and preventive action for the complaint.
+    """
+    prompt = CAPA_PROMPT.format(text=state["raw_text"])
+    capa = ask_llm(prompt).strip()
+    return {"capa": capa}
